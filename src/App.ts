@@ -38,9 +38,8 @@ class App {
 
     private draw() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.context.beginPath();
 
-        const now = Math.floor(Math.abs((Date.now() / 10) % (2 * this.canvas.height) - this.canvas.height));
+        const now = Math.floor(Math.abs((Date.now() / 20) % (2 * this.canvas.height) - this.canvas.height));
 
         const radii = [125, 100];
         const xs = [200, 400];
@@ -58,7 +57,7 @@ class App {
 
         const threshold = 1;
 
-        const squareLength = 16;
+        const squareLength = 12;  // TODO: dynamic based on frame rate
         const xiMax = (this.canvas.width / squareLength) + 1;
         const yiMax = (this.canvas.height / squareLength) + 1;
 
@@ -74,15 +73,22 @@ class App {
             for (let xi = 1; xi < xiMax; ++xi) {
                 const x = xi * squareLength;
                 thisRow.push(f(x, y));
+                const corners: [number, number, number, number] = [
+                    prevRow[xi - 1],
+                    prevRow[xi],
+                    thisRow[xi - 1],
+                    thisRow[xi]
+                ];
                 const squareCode =
-                    (+(prevRow[xi - 1] > threshold) << 3) |
-                    (+(prevRow[xi]     > threshold) << 2) |
-                    (+(thisRow[xi - 1] > threshold) << 1) |
-                    (+(thisRow[xi]     > threshold));
-                const lines = cases[squareCode](f, x, y, squareLength, threshold);
+                    (+(corners[0] > threshold) << 3) |
+                    (+(corners[1] > threshold) << 2) |
+                    (+(corners[2] > threshold) << 1) |
+                    (+(corners[3] > threshold));
+                const lines = cases[squareCode](corners, x, y, squareLength, threshold, f);
                 const b = Math.floor(255 * x / this.canvas.width);
                 this.context.strokeStyle = `rgb(0, ${255 - b}, ${b})`;
                 lines.forEach((line) => {
+                    this.context.beginPath();
                     this.context.moveTo(line[0], line[1]);
                     this.context.lineTo(line[2], line[3]);
                     this.context.stroke();
