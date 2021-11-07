@@ -37,13 +37,26 @@ class App {
     }
 
     private draw() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.context.beginPath();
+
+        const now = Math.floor(Math.abs((Date.now() / 10) % (2 * this.canvas.height) - this.canvas.height));
+
+        const radii = [125, 100];
+        const xs = [200, 400];
+        const ys = [200, now];
+
         function f(x: number, y: number): number {
-            const dx = x - 200;
-            const dy = y - 200;
-            return 1 / (dx * dx + dy * dy);
+            let total = 0;
+            for (let i = 0; i < 2; ++i) {
+                const dx = x - xs[i];
+                const dy = y - ys[i];
+                total += (radii[i] * radii[i]) / (dx * dx + dy * dy);
+            }
+            return total;
         }
 
-        const threshold = 0.0000625;
+        const threshold = 1;
 
         const squareLength = 16;
         const xiMax = (this.canvas.width / squareLength) + 1;
