@@ -70,7 +70,7 @@ class App {
 
         const threshold = 1;
 
-        const squareLength = 12;  // TODO: dynamic based on frame rate
+        const squareLength = 8;  // TODO: dynamic based on frame rate
         const xiMax = (this.canvas.width / squareLength) + 1;
         const yiMax = (this.canvas.height / squareLength) + 1;
 
