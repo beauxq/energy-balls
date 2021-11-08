@@ -1,8 +1,13 @@
 import { cases } from './square';
+import Ball from './Ball';
 
 class App {
     private canvas: HTMLCanvasElement;
     private context: CanvasRenderingContext2D;
+
+    private lastT: number;
+
+    private balls: Ball[];
 
     constructor(width: number, height: number) {
         this.canvas = document.getElementById('c') as HTMLCanvasElement;
@@ -13,21 +18,27 @@ class App {
         this.canvas.addEventListener('click', (e) => {
             console.log(`click: ${e.x} ${e.y}`);
         });
-        this.canvas.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            console.log(`right click: ${e.x} ${e.y}`);
-        });
-        this.canvas.addEventListener('wheel', (e) => {
-            const down = e.deltaY > 0;
-            const x = e.offsetX;
-            const y = e.offsetY;
-            
-            console.log(`wheel event:  offsetX ${x}  offsetY ${y}  down ${down}`);
-        });
 
-        requestAnimationFrame(() => {
-            this.draw();
+        this.lastT = 0;
+
+        this.balls = [];
+        this.makeBalls();
+
+        requestAnimationFrame((t_ms) => {
+            this.draw(t_ms);
         });
+    }
+
+    private makeBalls() {
+        const ballCount = Math.floor(Math.min(12, Math.max(4, this.canvas.width * this.canvas.height / 150000 + 2)));
+        console.log("" + ballCount + " balls");
+        for (let _ = ballCount; _ > 0; --_) {
+            this.balls.push(new Ball(Math.random() * Math.min(this.canvas.height, this.canvas.width) / 5 + 17,
+                                     Math.random() * this.canvas.width,
+                                     Math.random() * this.canvas.height,
+                                     Math.random() * 0.04,
+                                     Math.random() * 0.04));
+        }
     }
 
     public resize(width: number, height: number) {
@@ -36,21 +47,23 @@ class App {
         this.context = this.canvas.getContext('2d')!;
     }
 
-    private draw() {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    private draw(t_ms: number) {
+        let dt = t_ms - this.lastT;
+        if (dt > 500) {
+            dt = 0;
+        }
+        this.lastT = t_ms;
 
-        const now = Math.floor(Math.abs((Date.now() / 20) % (2 * this.canvas.height) - this.canvas.height));
+        for (let ball of this.balls) {
+            ball.update(dt, this.canvas.width, this.canvas.height);
+        }
 
-        const radii = [125, 100];
-        const xs = [200, 400];
-        const ys = [200, now];
-
-        function f(x: number, y: number): number {
+        const f = (x: number, y: number): number => {
             let total = 0;
-            for (let i = 0; i < 2; ++i) {
-                const dx = x - xs[i];
-                const dy = y - ys[i];
-                total += (radii[i] * radii[i]) / (dx * dx + dy * dy);
+            for (let ball of this.balls) {
+                const dx = x - ball.x;
+                const dy = y - ball.y;
+                total += (ball.radius * ball.radius) / (dx * dx + dy * dy);
             }
             return total;
         }
@@ -67,6 +80,7 @@ class App {
             const y = 0;
             prevRow.push(f(x, y));
         }
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let yi = 1; yi < yiMax; ++yi) {
             const y = yi * squareLength;
             const thisRow = [f(0, y)];
@@ -97,8 +111,8 @@ class App {
             prevRow = thisRow;
         }
 
-        requestAnimationFrame(() => {
-            this.draw();
+        requestAnimationFrame((t_ms) => {
+            this.draw(t_ms);
         });
     }
 }
