@@ -101,6 +101,7 @@ class App {
                 const lines = cases[squareCode](corners, x, y, squareLength, threshold, f);
                 const b = Math.floor(255 * x / this.canvas.width);
                 this.context.strokeStyle = `rgb(0, ${255 - b}, ${b})`;
+                this.context.lineWidth = 3;
                 lines.forEach((line) => {
                     this.context.beginPath();
                     this.context.moveTo(line[0], line[1]);
