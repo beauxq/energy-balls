@@ -1,12 +1,13 @@
 class Ball {
-    public radius: number;
+    /** radius squared */
+    public radius2: number;
     public x: number;
     public y: number;
     public dx_ms: number;
     public dy_ms: number;
 
-    constructor(radius: number, x: number, y: number, dx_ms: number, dy_ms: number) {
-        this.radius = radius;
+    constructor(radius2: number, x: number, y: number, dx_ms: number, dy_ms: number) {
+        this.radius2 = radius2;
         this.x = x;
         this.y = y;
         this.dx_ms = dx_ms;

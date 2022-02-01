@@ -33,7 +33,7 @@ class App {
         const ballCount = Math.floor(Math.min(12, Math.max(4, this.canvas.width * this.canvas.height / 150000 + 2)));
         console.log("" + ballCount + " balls");
         for (let _ = ballCount; _ > 0; --_) {
-            this.balls.push(new Ball(Math.random() * Math.min(this.canvas.height, this.canvas.width) / 5 + 17,
+            this.balls.push(new Ball(Math.pow(Math.random() * Math.min(this.canvas.height, this.canvas.width) / 6 + 17, 2),
                                      Math.random() * this.canvas.width,
                                      Math.random() * this.canvas.height,
                                      Math.random() * 0.04,
@@ -63,7 +63,7 @@ class App {
             for (let ball of this.balls) {
                 const dx = x - ball.x;
                 const dy = y - ball.y;
-                total += (ball.radius * ball.radius) / (dx * dx + dy * dy);
+                total += ball.radius2 / (dx * dx + dy * dy);
             }
             return total;
         }
